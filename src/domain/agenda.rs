@@ -4,22 +4,22 @@ use uuid::Uuid;
 use crate::traits::EntityCollection;
 
 #[derive(Debug, Clone, Serialize)]
-pub struct Participant {
+pub struct Agenda {
   pub id: String,
-  pub name: String,
+  pub title: String,
 }
 
-impl Participant {
-  pub fn new(name: String) -> Self {
+impl Agenda {
+  pub fn new(title: String) -> Self {
     Self {
       id: Uuid::new_v4().to_string(),
-      name,
+      title,
     }
   }
 }
 
-impl EntityCollection for Vec<Participant> {
+impl EntityCollection for Vec<Agenda> {
   fn get_titles(&self) -> Vec<&str> {
-    self.iter().map(|a| a.name.as_str()).collect()
+    self.iter().map(|a| a.title.as_str()).collect()
   }
 }

@@ -1,10 +1,13 @@
 mod domain;
 mod error;
 mod io;
+mod traits;
 
+use domain::agenda::Agenda;
 use domain::participant::Participant;
 use io::input::read_line;
 use std::process;
+use traits::EntityCollection;
 
 fn main() {
   println!("Planning Poker");
@@ -39,7 +42,36 @@ fn main() {
     process::exit(1);
   }
 
-  let names: Vec<&str> = participants.iter().map(|p| p.name.as_str()).collect();
+  println!("Participant: {} \r\n", participants.get_titles_as_string());
+  println!("Let's choose agendas");
 
-  print!("Let's start. Participant: {}", names.join(", "));
+  let mut agendas: Vec<Agenda> = Vec::new();
+
+  loop {
+    match read_line("Agenda (empty to finish): ") {
+      Ok(title) => {
+        if title.is_empty() {
+          if !agendas.is_empty() {
+            break;
+          }
+
+          println!("At least one agenda for discussion is needed");
+          continue;
+        }
+        agendas.push(Agenda::new(title));
+      }
+      Err(error) => {
+        eprintln!("{}", error);
+        break;
+      }
+    }
+  }
+
+  if agendas.is_empty() {
+    eprintln!("There are no agendas. GAME OVER");
+    process::exit(1);
+  }
+
+  println!("Agendas: {} \r\n", agendas.get_titles_as_string());
+  println!("Let's ROCK!");
 }
