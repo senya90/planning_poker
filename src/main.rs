@@ -9,6 +9,12 @@ use io::input::read_line;
 use std::process;
 use traits::EntityCollection;
 
+use crate::domain::round::Round;
+use crate::domain::session::PlanningSession;
+use crate::domain::vote::Vote;
+use crate::error::AppError;
+use crate::io::output::print_round;
+
 fn main() {
   println!("Planning Poker");
 
@@ -73,5 +79,39 @@ fn main() {
   }
 
   println!("Agendas: {} \r\n", agendas.get_titles_as_string());
-  println!("Let's ROCK!");
+
+  let session = PlanningSession {
+    participants,
+    agendas,
+    current_round: None,
+  };
+
+  let mut round = Round::new();
+
+  for p in &session.participants {
+    let raw = read_line(&format!("Vote for {} (1/2/3/5/8/13/21) ", p.name));
+
+    let raw = match raw {
+      Ok(value) => value,
+      Err(error) => {
+        eprintln!("Error reading input, {}", error);
+        process::exit(1);
+      }
+    };
+
+    let vote = Vote::parse(&raw).ok_or_else(|| AppError::InvalidInput("Unknown vote".into()));
+
+    let vote = match vote {
+      Ok(vote) => vote,
+      Err(error) => {
+        eprintln!("Parsing error, {}", error);
+        process::exit(1);
+      }
+    };
+
+    round.cast_vote(&p.id, vote);
+  }
+
+  round.reveal();
+  print_round(&round);
 }
