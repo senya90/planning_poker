@@ -6,14 +6,14 @@ use serde::Serialize;
 #[derive(Debug, Serialize)]
 pub struct Round {
   pub votes: HashMap<String, Vote>,
-  pub revealed: bool,
+  is_finish: bool,
 }
 
 impl Round {
   pub fn new() -> Self {
     Self {
       votes: HashMap::new(),
-      revealed: false,
+      is_finish: false,
     }
   }
 
@@ -21,7 +21,7 @@ impl Round {
     self.votes.insert(participant_id.to_string(), vote);
   }
 
-  pub fn reveal(&mut self) {
-    self.revealed = true;
+  pub fn finish(&mut self) {
+    self.is_finish = true;
   }
 }

@@ -5,14 +5,12 @@ mod traits;
 
 use domain::agenda::Agenda;
 use domain::participant::Participant;
-use io::input::read_line;
 use std::process;
 use traits::EntityCollection;
 
 use crate::domain::round::Round;
 use crate::domain::session::PlanningSession;
 use crate::domain::vote::Vote;
-use crate::error::AppError;
 use crate::io::output::print_round;
 
 fn main() {
@@ -46,17 +44,7 @@ fn main() {
   let mut round = Round::new();
 
   for p in &session.participants {
-    let raw_vote = read_line(&format!("Vote for {} (1/2/3/5/8/13/21) ", p.name));
-
-    let raw_vote = match raw_vote {
-      Ok(value) => value,
-      Err(error) => {
-        eprintln!("Error reading input, {}", error);
-        process::exit(1);
-      }
-    };
-
-    let vote = Vote::parse(&raw_vote).ok_or_else(|| AppError::InvalidInput("Unknown vote".into()));
+    let vote = Vote::read_vote(p);
 
     let vote = match vote {
       Ok(vote) => vote,
@@ -69,6 +57,6 @@ fn main() {
     round.cast_vote(&p.id, vote);
   }
 
-  round.reveal();
+  round.finish();
   print_round(&round);
 }
