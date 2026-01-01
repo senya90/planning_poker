@@ -1,7 +1,7 @@
 use serde::Serialize;
 use uuid::Uuid;
 
-use crate::traits::EntityCollection;
+use crate::{io::input::read_line, traits::EntityCollection};
 
 #[derive(Debug, Clone, Serialize)]
 pub struct Agenda {
@@ -15,6 +15,32 @@ impl Agenda {
       id: Uuid::new_v4().to_string(),
       title,
     }
+  }
+
+  pub fn read_agendas_by_input() -> Vec<Agenda> {
+    let mut agendas: Vec<Agenda> = Vec::new();
+
+    loop {
+      match read_line("Agenda (empty to finish): ") {
+        Ok(title) => {
+          if title.is_empty() {
+            if !agendas.is_empty() {
+              break;
+            }
+
+            println!("At least one agenda for discussion is needed");
+            continue;
+          }
+          agendas.push(Agenda::new(title));
+        }
+        Err(error) => {
+          eprintln!("{}", error);
+          break;
+        }
+      }
+    }
+
+    agendas
   }
 }
 
