@@ -8,9 +8,7 @@ use domain::task::Task;
 use std::process;
 use traits::EntityCollection;
 
-use crate::domain::round::Round;
 use crate::domain::session::PlanningSession;
-use crate::io::output::print_round;
 
 fn main() {
   println!("Planning Poker");
@@ -37,8 +35,4 @@ fn main() {
   let mut session = PlanningSession::new(participants, tasks);
 
   session.play();
-
-  let mut round = Round::new();
-  round.finish();
-  print_round(&round);
 }

@@ -19,13 +19,14 @@ impl Round {
     }
   }
 
-  pub fn finish(&mut self) {
+  pub fn finish(&mut self, vote: Vote) {
     self.is_finish = true;
+    self.final_vote = Some(vote);
   }
 
-  pub fn collect_votes(&mut self, participants: &[Participant]) {
+  pub fn fill_votes(&mut self, participants: &[Participant]) {
     participants.iter().for_each(|p| {
-      let vote = Vote::read_vote(p);
+      let vote = Vote::read_vote(Some(p));
       self.votes.insert(p.id.to_string(), vote);
     });
   }

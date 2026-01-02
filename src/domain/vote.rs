@@ -14,9 +14,14 @@ pub enum Vote {
 }
 
 impl Vote {
-  pub fn read_vote(participant: &Participant) -> Vote {
+  pub fn read_vote(participant: Option<&Participant>) -> Vote {
     loop {
-      let raw_vote = read_line(&format!("Vote for {} (1/2/3/5/8/13/21) ", participant.name));
+      let prompt = match participant {
+        Some(p) => &format!("Vote for {} (1/2/3/5/8/13/21) ", p.name),
+        None => &format!("Vote (1/2/3/5/8/13/21) "),
+      };
+
+      let raw_vote = read_line(prompt);
 
       let raw_vote = match raw_vote {
         Ok(value) => value,
