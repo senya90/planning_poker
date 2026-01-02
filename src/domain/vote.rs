@@ -1,8 +1,10 @@
+use core::fmt;
+
 use serde::Serialize;
 
 use crate::{domain::participant::Participant, error::AppError, io::input::read_line};
 
-#[derive(Debug, Clone, Copy, Serialize)]
+#[derive(Debug, Clone, Copy, Serialize, PartialEq)]
 pub enum Vote {
   One,
   Two,
@@ -18,7 +20,7 @@ impl Vote {
     loop {
       let prompt = match participant {
         Some(p) => &format!("Vote for {} (1/2/3/5/8/13/21) ", p.name),
-        None => &format!("Vote (1/2/3/5/8/13/21) "),
+        None => &"Vote (1/2/3/5/8/13/21) ".to_string(),
       };
 
       let raw_vote = read_line(prompt);
@@ -53,6 +55,20 @@ impl Vote {
       "13" => Some(Vote::Thirteen),
       "21" => Some(Vote::TwentyOne),
       _ => None,
+    }
+  }
+}
+
+impl fmt::Display for Vote {
+  fn fmt(&self, f: &mut fmt::Formatter<'_>) -> fmt::Result {
+    match self {
+      Vote::One => write!(f, "1"),
+      Vote::Two => write!(f, "2"),
+      Vote::Three => write!(f, "3"),
+      Vote::Five => write!(f, "5"),
+      Vote::Eight => write!(f, "8"),
+      Vote::Thirteen => write!(f, "13"),
+      Vote::TwentyOne => write!(f, "21"),
     }
   }
 }

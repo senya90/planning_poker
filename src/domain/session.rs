@@ -1,8 +1,6 @@
-use std::fmt::Display;
-
 use crate::{
   domain::{participant::Participant, round::Round, task::Task, vote::Vote},
-  io::input::{YesNo, read_line, read_yes_no},
+  io::input::{YesNo, read_yes_no},
 };
 use serde::Serialize;
 
@@ -24,20 +22,41 @@ impl PlanningSession {
     self.tasks.iter_mut().for_each(|task| {
       loop {
         let mut round = Round::new();
+        println!(
+          "Task: {}, ROUND: {}",
+          task.title,
+          task.get_ended_rounds_count() + 1
+        );
         round.fill_votes(&self.participants);
 
         let is_success = read_yes_no("Is the round successful? (y/N): ");
 
         match is_success {
           YesNo::Yes => {
-            let final_res = Vote::read_vote(None);
+            let final_res = match round.is_unanimously() {
+              (true, Some(vote)) => {
+                println!("UNANIMOUSLY {}", vote);
+                vote
+              }
+              _ => Vote::read_vote(None),
+            };
+
             round.finish(final_res);
+            task.add_round(round);
+            println!("END of round {}\r\n", task.get_ended_rounds_count());
+            break;
           }
           YesNo::No => {
+            task.add_round(round);
+            println!("END of round {}\r\n", task.get_ended_rounds_count());
             continue;
           }
         }
       }
+    });
+
+    self.tasks.iter().for_each(|t| {
+      println!("{:#?}", t);
     });
   }
 }

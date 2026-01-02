@@ -5,9 +5,9 @@ use crate::{domain::round::Round, io::input::read_line, traits::EntityCollection
 
 #[derive(Debug, Clone, Serialize)]
 pub struct Task {
-  pub id: String,
   pub title: String,
-  pub round: Option<Round>,
+  id: String,
+  rounds: Vec<Round>,
 }
 
 impl Task {
@@ -15,7 +15,7 @@ impl Task {
     Self {
       id: Uuid::new_v4().to_string(),
       title,
-      round: None,
+      rounds: Vec::new(),
     }
   }
 
@@ -43,6 +43,14 @@ impl Task {
     }
 
     tasks
+  }
+
+  pub fn add_round(&mut self, round: Round) {
+    self.rounds.push(round);
+  }
+
+  pub fn get_ended_rounds_count(&self) -> usize {
+    self.rounds.len()
   }
 }
 

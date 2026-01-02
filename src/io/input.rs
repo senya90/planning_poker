@@ -30,7 +30,7 @@ pub fn read_line(prompt: &str) -> Result<String, AppError> {
 }
 
 pub fn read_yes_no(prompt: &str) -> YesNo {
-  let result = loop {
+  loop {
     let is_success = read_line(prompt);
 
     let is_success = match is_success {
@@ -49,7 +49,5 @@ pub fn read_yes_no(prompt: &str) -> YesNo {
         continue;
       }
     }
-  };
-
-  result
+  }
 }

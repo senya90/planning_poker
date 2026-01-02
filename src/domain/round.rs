@@ -30,4 +30,15 @@ impl Round {
       self.votes.insert(p.id.to_string(), vote);
     });
   }
+
+  pub fn is_unanimously(&self) -> (bool, Option<Vote>) {
+    let mut iter = self.votes.values();
+
+    if let Some(first) = iter.next() {
+      let result = iter.all(|value| value == first);
+      (result, Some(*first))
+    } else {
+      (false, None)
+    }
+  }
 }
