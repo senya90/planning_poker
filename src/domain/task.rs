@@ -1,37 +1,39 @@
 use serde::Serialize;
 use uuid::Uuid;
 
-use crate::{io::input::read_line, traits::EntityCollection};
+use crate::{domain::round::Round, io::input::read_line, traits::EntityCollection};
 
 #[derive(Debug, Clone, Serialize)]
-pub struct Agenda {
+pub struct Task {
   pub id: String,
   pub title: String,
+  pub round: Option<Round>,
 }
 
-impl Agenda {
+impl Task {
   pub fn new(title: String) -> Self {
     Self {
       id: Uuid::new_v4().to_string(),
       title,
+      round: None,
     }
   }
 
-  pub fn read_agendas_by_input() -> Vec<Agenda> {
-    let mut agendas: Vec<Agenda> = Vec::new();
+  pub fn read_tasks_by_input() -> Vec<Task> {
+    let mut tasks: Vec<Task> = Vec::new();
 
     loop {
-      match read_line("Agenda (empty to finish): ") {
+      match read_line("Task (empty to finish): ") {
         Ok(title) => {
           if title.is_empty() {
-            if !agendas.is_empty() {
+            if !tasks.is_empty() {
               break;
             }
 
-            println!("At least one agenda for discussion is needed");
+            println!("At least one task for discussion is needed");
             continue;
           }
-          agendas.push(Agenda::new(title));
+          tasks.push(Task::new(title));
         }
         Err(error) => {
           eprintln!("{}", error);
@@ -40,11 +42,11 @@ impl Agenda {
       }
     }
 
-    agendas
+    tasks
   }
 }
 
-impl EntityCollection for Vec<Agenda> {
+impl EntityCollection for Vec<Task> {
   fn get_titles(&self) -> Vec<&str> {
     self.iter().map(|a| a.title.as_str()).collect()
   }

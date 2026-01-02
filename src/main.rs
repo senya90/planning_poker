@@ -3,14 +3,13 @@ mod error;
 mod io;
 mod traits;
 
-use domain::agenda::Agenda;
 use domain::participant::Participant;
+use domain::task::Task;
 use std::process;
 use traits::EntityCollection;
 
 use crate::domain::round::Round;
 use crate::domain::session::PlanningSession;
-use crate::domain::vote::Vote;
 use crate::io::output::print_round;
 
 fn main() {
@@ -24,39 +23,22 @@ fn main() {
   }
 
   println!("Participant: {} \r\n", participants.get_titles_as_string());
-  println!("Let's choose agendas");
+  println!("Let's choose tasks");
 
-  let agendas: Vec<Agenda> = Agenda::read_agendas_by_input();
+  let tasks: Vec<Task> = Task::read_tasks_by_input();
 
-  if agendas.is_empty() {
-    eprintln!("There are no agendas. GAME OVER");
+  if tasks.is_empty() {
+    eprintln!("There are no tasks. GAME OVER");
     process::exit(1);
   }
 
-  println!("Agendas: {} \r\n", agendas.get_titles_as_string());
+  println!("Tasks: {} \r\n", tasks.get_titles_as_string());
 
-  let session = PlanningSession {
-    participants,
-    agendas,
-    current_round: None,
-  };
+  let mut session = PlanningSession::new(participants, tasks);
+
+  session.play();
 
   let mut round = Round::new();
-
-  for p in &session.participants {
-    let vote = Vote::read_vote(p);
-
-    let vote = match vote {
-      Ok(vote) => vote,
-      Err(error) => {
-        eprintln!("Parsing error, {}", error);
-        process::exit(1);
-      }
-    };
-
-    round.cast_vote(&p.id, vote);
-  }
-
   round.finish();
   print_round(&round);
 }
